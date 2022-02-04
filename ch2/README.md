@@ -1,3 +1,4 @@
+
 # fastcampus-1
 스프링의 정석: 남궁성 선생님과 함께
 
@@ -27,3 +28,41 @@ public class Hello {
 	}
 }
 ```
+##  :pushpin: 클라이언트와 서버
+<details>
+<summary><b>1. 클라이언트와 서버 </b></summary>
+<div markdown="1">
+
+- 클라이언트(Client): 서비스를 요청하는 에플리케이션(or컴퓨터)
+- 서버(Server): 서비스(Service)를 제공하는 에플리케이션(or컴퓨터)
+	- Tomcat이 있다.
+</div>
+</details>
+
+<details>
+<summary><b>2. 서버의 종류 </b></summary>
+<div markdown="1">
+
+어떤 서비스를 제공할 것인가?
+- WebService: 브라우저로 할 수 있는 모든 것
+- EmailService
+- FileService
+
+포트(port)번호로 구분이 가능하다.
+</div>
+</details>
+
+<details>
+<summary><b>4. 웹 애플리케이션 서버(WAS)란? </b></summary>
+<div markdown="1">
+
+####  웹 애플리케이션 서버(WAS): 웹 애플리케이션을 서비스하는 서버(Tomcat)
+- Web Application Service? : 에플리케이션(프로그램)을 클라이언트가 사용할 수 있도록
+- EmailService
+- FileService
+
+포트(port)번호로 구분이 가능하다.
+</div>
+</details>
+
+
