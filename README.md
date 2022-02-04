@@ -1,3 +1,3 @@
 # fastcampus
-## CH2 : https://github.com/KhaeMiin/fastcampus/blob/master/ch2
+## CH2 : https://github.com/KhaeMiin/fastcampus/tree/master/ch2#fastcampus-1
 
