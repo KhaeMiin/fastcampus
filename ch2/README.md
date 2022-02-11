@@ -92,3 +92,64 @@ Hyper Text(html) Teansfer(전송) Protocol
 </details>
 
 
+## :pushpin: 쿠키(Cookie)
+> 수업코드
+> [controller](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/java/com/fastcampus/ch2/LoginController.java)
+> [jsp}(https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/webapp/WEB-INF/views/loginForm.jsp#L60)
+### 1. 쿠키란?
+- 이름과 값의 쌍으로 구성된 작은 정보다.
+name = value
+- 기본적으로 아스키 문자만 저장이 가능하다.
+(한글은 URL인코딩을 해줘야한다.)
+
+- 서버에서 생성 후 전공, 브라우저에 저장. 유효기간이 지나면 자동 삭제된다.
+- 서버에 요청시 도메인과 path가 일치(하위경로 포함)하는 경우에만 자동으로 전송
+
+### 2.작동 과정
+- 클라이언트가 서버에 요청한다.
+- 서버가 코드를 수행한 후 쿠키가 만들어지고 응답에 담아서 보낸다.
+set-Cookie: name=value
+- 응답이 클라이언트한테 전달됨(쿠키도 함께)
+- 서버가 보내준 쿠키가 브라우저에 저장이 됨
+- 클라이언트가 서버에 요청하게되면 저장된 쿠키도 요청헤더에 쿠키가 따라간다.
+<br>
+쿠키: 클라이언트 식별 기술(구별)
+
+### 3.쿠키의 생성
+```
+//서버에서 실행되는 코드
+Cookie cookie = new Cookie("id","asdf"); //쿠키 생성("name","value")
+cookie.setMaxAge(60*60*24); //유효기간 설정(초)
+reponse.addCookie(cookie); //응답에 쿠키 추가(서버 헤더에 넣어준다)
+```
+### 3.쿠키의 삭제와 변경
+```
+//서버에서 실행되는 코드
+Cookie cookie = new Cookie("id",""); //변경할 쿠키와 같은 이름 쿠키생성(value안넣어줘도된다)
+cookie.setMaxAge(0); //유효기간을 0으로 설정(삭제)
+reponse.addCookie(cookie); //응답에 변경된 쿠키 추가(서버 헤더에 넣어준다)
+```
+
+### 4.쿠키의 변경
+```
+//서버에서 실행되는 코드
+Cookie cookie = new Cookie("id",""); //변경할 쿠키와 같은 이름 쿠키 생성
+cookie.setValue(URLEncoder.encode("변경name")); //값의 변경
+cookie.setDomain("www.fastcampus.co.kr");//도메인변경
+cookie.setPath("/ch2"); //경로변경
+cookie.setMaxAge(60*60*24*7); //유효기간 설정(초)
+reponse.addCookie(cookie); //응답에 쿠키 추가(서버 헤더에 넣어준다)
+```
+### 5.쿠키 읽어 오기
+
+```
+//쿠키가 여러개일 수 있으니 배열사용
+Cookie[] cookies = request.getCookie(); //쿠키 읽기
+
+for(Cookie cookie : cookie) {
+String name = cookie.getName();
+String value = cookie.getValue();
+
+System.out.printf("[cookie]name=%s, value=%s%n", name, value);
+}
+```
