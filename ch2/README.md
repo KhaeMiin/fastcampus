@@ -93,9 +93,9 @@ Hyper Text(html) Teansfer(전송) Protocol
 
 
 ## :pushpin: 쿠키(Cookie)
-> 수업코드
-> [controller](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/java/com/fastcampus/ch2/LoginController.java)
-> [jsp](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/webapp/WEB-INF/views/loginForm.jsp#L60)
+> 수업코드<br>
+> [controller](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/java/com/fastcampus/ch2/LoginController.java)<br>
+> [jsp](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/webapp/WEB-INF/views/loginForm.jsp#L60)<br>
 ### 1. 쿠키란?
 - 이름과 값의 쌍으로 구성된 작은 정보다.
 name = value
