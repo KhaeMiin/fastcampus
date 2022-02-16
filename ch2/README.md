@@ -153,3 +153,41 @@ String value = cookie.getValue();
 System.out.printf("[cookie]name=%s, value=%s%n", name, value);
 }
 ```
+
+
+## :pushpin: 세션(Session)
+### 세션(Sesscion)이란?
+**서로 관련된 요청(응답포함)들을 하나로 묶은 것** → 쿠키를 이용
+브라우저마다 개별저장도(Session 객체)를 서버에서 제공 → 서버에 저장
+
+### 1. Controller에서 세션 저장소를 사용하기
+```
+HttpSession session = request.getSession();
+session.setAttribute("key","value"); //저장소에 key라는 이름으로 value를 넣는다.
+session .getAttribute("key"); //저장소에 key로 저장된 value를 가져온다.
+```
+
+
+### 2. 세션의 종료방법
+1. 수동 종료
+```
+HttpSession session = request.getSession();
+session.invalidate(); //방법1. 세션을 즉시 종료
+session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
+```
+2. 자동종료 - web.xml
+```
+<session-config>
+	<session-timeout>30</session-timeout> //분단위
+</session-config>
+```
+### 3.세션과 쿠키
+
+|쿠키|서버|
+|------|------|
+|브라우저에 저장|서버에 저장|
+|서버 부담이 없다.|서버에 부담이 있다.|
+|보안에 불리|보안에 유리|
+|서버 다중화에 유리|서버 다중화에 불리|
+
+
