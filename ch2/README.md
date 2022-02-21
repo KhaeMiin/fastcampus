@@ -191,3 +191,53 @@ session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
 |서버 다중화에 유리|서버 다중화에 불리|
 
 
+##  :pushpin: 예외 처리
+- 예외 처리를 위한 메서드를 작성하고 @ExceptionHandler를 붙인다.
+- @ControllerAdvice로 전역(모든 컨트롤러) 예외 처리 클래스 작성 가능(패키지 지정 가능: 아무것도 안적으면 모든 패키지)
+	**예외 처리 메서드가 중복된 경우, 컨트롤러 내의 예외 처리 메서드가 우선**
+- @ResponseStatus 
+	응답 메세지의 상태 코드를 변경할 때 사용
+
+	```
+		@ResponseStatus(HttpStatus.Method_Not_ALLOWED)//405 Method Not Allowd
+		@ExceptionHandler(NullPointException.class)
+		public String catcher(Exception ex, Model m) {
+			m.addAttribute("ex", ex);
+			return "error";
+		}
+	```
+
+- web.xml에 <error-page>로 상태 코드별 뷰 지정 가능
+	```
+	//예시
+		<error-page>
+			<error-code>400</error-code>
+			<location>/error400.jsp</location>
+		</error-page>
+	```
+- 에외 종류별 뷰 맵핑에 사용. servlet-context.xml에 등록
+	```
+	<!--view-controller path="/register/add" view-name="registerForm"/-->	
+	<context:component-scan base-package="com.fastcampus.ch2" />
+	<beans:bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<beans:property name="defaultErrorView" value="error"/>
+    		<beans:property name="exceptionMappings">
+      			<beans:props>
+        			<beans:prop key="com.fastcampus.ch2.MyException">error400</beans:prop>
+      			</beans:props>
+    		</beans:property>
+		<beans:property name="statusCodes">
+			<beans:props>
+        			<beans:prop key="error400">400</beans:prop>
+			</beans:props>
+		</beans:property>
+  	</beans:bean>
+	```
+- 정리: 스프링에서의 예외 처리
+	- 컨트롤러 메서드 내에서 try-catch로 처리
+	- 컨트롤러에 @ExceptionHandler가 붙은 메서드로 처리
+	- @ControllerAdvice클래스의 @ExceptionHandler메서드가 처리
+	- 예외 종류별로 뷰 지정 - SimpleMappingExceptionResolver
+	- 응답 상태 코드별로 뷰 지정 - <error-page>
+
+
