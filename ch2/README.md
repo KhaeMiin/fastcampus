@@ -207,7 +207,7 @@ session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
 		}
 	```
 
-- web.xml에 <error-page>로 상태 코드별 뷰 지정 가능
+- web.xml에 <error-page>로 상태 코드별 뷰 지정 가능 (https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/webapp/WEB-INF/web.xml#L51)
 	```
 	//예시
 		<error-page>
@@ -215,7 +215,7 @@ session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
 			<location>/error400.jsp</location>
 		</error-page>
 	```
-- 에외 종류별 뷰 맵핑에 사용. servlet-context.xml에 등록
+- 에외 종류별 뷰 맵핑에 사용. servlet-context.xml에 등록(https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml#L33)
 	```
 	<!--view-controller path="/register/add" view-name="registerForm"/-->	
 	<context:component-scan base-package="com.fastcampus.ch2" />
