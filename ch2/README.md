@@ -153,3 +153,91 @@ String value = cookie.getValue();
 System.out.printf("[cookie]name=%s, value=%s%n", name, value);
 }
 ```
+
+
+## :pushpin: 세션(Session)
+### 세션(Sesscion)이란?
+**서로 관련된 요청(응답포함)들을 하나로 묶은 것** → 쿠키를 이용
+브라우저마다 개별저장도(Session 객체)를 서버에서 제공 → 서버에 저장
+
+### 1. Controller에서 세션 저장소를 사용하기
+```
+HttpSession session = request.getSession();
+session.setAttribute("key","value"); //저장소에 key라는 이름으로 value를 넣는다.
+session .getAttribute("key"); //저장소에 key로 저장된 value를 가져온다.
+```
+
+
+### 2. 세션의 종료방법
+1. 수동 종료
+```
+HttpSession session = request.getSession();
+session.invalidate(); //방법1. 세션을 즉시 종료
+session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
+```
+2. 자동종료 - web.xml
+```
+<session-config>
+	<session-timeout>30</session-timeout> //분단위
+</session-config>
+```
+### 3.세션과 쿠키
+
+|쿠키|서버|
+|------|------|
+|브라우저에 저장|서버에 저장|
+|서버 부담이 없다.|서버에 부담이 있다.|
+|보안에 불리|보안에 유리|
+|서버 다중화에 유리|서버 다중화에 불리|
+
+
+##  :pushpin: 예외 처리
+- 예외 처리를 위한 메서드를 작성하고 @ExceptionHandler를 붙인다.
+- @ControllerAdvice로 전역(모든 컨트롤러) 예외 처리 클래스 작성 가능(패키지 지정 가능: 아무것도 안적으면 모든 패키지)
+	**예외 처리 메서드가 중복된 경우, 컨트롤러 내의 예외 처리 메서드가 우선**
+- @ResponseStatus 
+	응답 메세지의 상태 코드를 변경할 때 사용
+
+	```
+		@ResponseStatus(HttpStatus.Method_Not_ALLOWED)//405 Method Not Allowd
+		@ExceptionHandler(NullPointException.class)
+		public String catcher(Exception ex, Model m) {
+			m.addAttribute("ex", ex);
+			return "error";
+		}
+	```
+
+- web.xml에 <error-page>로 상태 코드별 뷰 지정 가능
+	```
+	//예시
+		<error-page>
+			<error-code>400</error-code>
+			<location>/error400.jsp</location>
+		</error-page>
+	```
+- 에외 종류별 뷰 맵핑에 사용. servlet-context.xml에 등록
+	```
+	<!--view-controller path="/register/add" view-name="registerForm"/-->	
+	<context:component-scan base-package="com.fastcampus.ch2" />
+	<beans:bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<beans:property name="defaultErrorView" value="error"/>
+    		<beans:property name="exceptionMappings">
+      			<beans:props>
+        			<beans:prop key="com.fastcampus.ch2.MyException">error400</beans:prop>
+      			</beans:props>
+    		</beans:property>
+		<beans:property name="statusCodes">
+			<beans:props>
+        			<beans:prop key="error400">400</beans:prop>
+			</beans:props>
+		</beans:property>
+  	</beans:bean>
+	```
+- 정리: 스프링에서의 예외 처리
+	- 컨트롤러 메서드 내에서 try-catch로 처리
+	- 컨트롤러에 @ExceptionHandler가 붙은 메서드로 처리
+	- @ControllerAdvice클래스의 @ExceptionHandler메서드가 처리
+	- 예외 종류별로 뷰 지정 - SimpleMappingExceptionResolver
+	- 응답 상태 코드별로 뷰 지정 - <error-page>
+
+
