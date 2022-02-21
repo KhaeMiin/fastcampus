@@ -1,0 +1,3 @@
+<%@ page contentType="text/html;charset=utf-8" isErrorPage="true"%>
+<!-- web.xml에 <error-page>로 지정해둔 에러 페이지 -->
+[400] 잘못된 요청입니다. 확인후 다시 한번 요청해주세요.
