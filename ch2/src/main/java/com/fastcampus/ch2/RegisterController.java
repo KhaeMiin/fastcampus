@@ -1,56 +1,74 @@
 package com.fastcampus.ch2;
 
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 
-import org.springframework.beans.propertyeditors.CustomDateEditor;
+import javax.validation.Valid;
+
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/register")
 public class RegisterController {
 	
 	@InitBinder
 	public void toDate(WebDataBinder binder) {
-		//user.Class¿¡¼­ 	@DateTimeFormat(pattern = "yyyy-MM-dd")¸¦ ºÙ¿´±â¶§¹®¿¡ ¾Æ·¡ µÎÁÙ »ı·«°¡´É
+		ConversionService conversionService = binder.getConversionService();
+		System.out.println("conversionService = " + conversionService);
+		//user.Classì—ì„œ 	@DateTimeFormat(pattern = "yyyy-MM-dd")ë¥¼ ë¶™ì˜€ê¸°ë•Œë¬¸ì— ì•„ë˜ ë‘ì¤„ ìƒëµê°€ëŠ¥
 //		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-//		binder.registerCustomEditor(Date.class, new CustomDateEditor(df, false));
+//		binder.registerCustomEditor(Date.class, new CustomDateEditor(df, false));//false: ë¹ˆ ê°’ì„ í—ˆìš©í•  ê²ƒì¸ì§€
 		binder.registerCustomEditor(String[].class, new StringArrayPropertyEditor("#"));
+//		binder.setValidator(new UserValidator());//UserValidatorë¥¼ WebDataBinderì˜ ë¡œì»¬ validatorë¡œ ë“±ë¡
+//		binder.addValidators(new UserValidator());//UserValidatorë¥¼ WebDataBinderì˜ ë¡œì»¬ validatorë¡œ ë“±ë¡
+		List<Validator> validatorList = binder.getValidators();
+		System.out.println("validatorList = " + validatorList);
 	}
 	
-//	@RequestMapping(value= "/register/save", method={RequsetMethod.GET, RequestMethod.POST})//GET,POST¸ğµÎ Çã¿ëÇÑ´Ù.(Method¸¦ ¾È½áÁÖ¸é_GET)
-//	@RequestMapping("/register/add")//½Å±ÔÈ¸¿ø °¡ÀÔ È­¸é
+//	@RequestMapping(value= "/register/save", method={RequsetMethod.GET, RequestMethod.POST})//GET,POSTëª¨ë‘ í—ˆìš©í•œë‹¤.(Methodë¥¼ ì•ˆì¨ì£¼ë©´_GET)
+//	@RequestMapping("/register/add")//ì‹ ê·œíšŒì› ê°€ì… í™”ë©´
 //	@GetMapping("/register/add")
 //	public String register() {
 //		return "registerForm";//WEB-INF/view/registerForm.jsp
 //	}
 	
-//	@RequestMapping(value= "/register/save", method=RequestMethod.POST)
-	@PostMapping("/register/save")//4.3ºÎÅÍ
-	public String save(User user, BindingResult result, Model m) throws Exception {//BindingResult result: ¿ì¸®°¡ ¹ÙÀÎµùÇÒ °´Ã¼ ¹Ù·Î µÚ¿¡ ¿Í¾ßÇÔ(À§Ä¡Á¶½É)
+//	@RequestMapping(value= "/save", method=RequestMethod.POST)
+	@PostMapping("/save")//4.3ë¶€í„°
+	public String save(@Valid User user, BindingResult result, Model m) throws Exception {//BindingResult result: ìš°ë¦¬ê°€ ë°”ì¸ë”©í•  ê°ì²´ ë°”ë¡œ ë’¤ì— ì™€ì•¼í•¨(ìœ„ì¹˜ì¡°ì‹¬)
 		System.out.println("result = " + result);
 		System.out.println("user = " + user);
-		//1.À¯È¿¼º °Ë»ç
-		if(!isValue(user)) {
-			String msg = URLEncoder.encode("id¸¦ Àß¸ø ÀÔ·ÂÇÏ¿´½À´Ï´Ù", "utf-8");
-			
-			m.addAttribute("msg", msg);
-			return "redirect:/register/add";//¾Æ·¡ return°ú µ¿ÀÏÇÔ(½ºÇÁ¸µÀÌ ÀÚµ¿À¸·Î ¾Æ·¡¿Í °°ÀÌ ¹Ù²ãÁÜ)
-			
-//			return "redirect:/register/add?msg=" + msg;//urlÀçÀÛ¼º
+		
+		//ìˆ˜ë™ ê²€ì¦ - Validatorë¥¼ ì§ì ‘ ìƒì„±í•˜ê³ , validator()ë¥¼ ì§ì ‘í˜¸ì¶œ
+//		UserValidator userValidator = new UserValidator();
+//		userValidator.validate(user, result); //BindingResultëŠ” Errorì˜ ìì†
+		
+		//Userê°ì²´ë¥¼ ê²€ì¦í•œ ê²°ê³¼ ì—ëŸ¬ê°€ ìˆìœ¼ë©´, registerFormì„ ì´ìš©í•´ì„œ ì—ëŸ¬ë¥¼ ë³´ì—¬ì¤˜ì•¼í•¨.
+		if(result.hasErrors()) {
+			return "registerForm";
 		}
-		//2.DB¿¡ ½Å±ÔÈ¸¿ø Á¤º¸ ÀúÀå
+		
+//		//1.ìœ íš¨ì„± ê²€ì‚¬
+//		if(!isValue(user)) {
+//			String msg = URLEncoder.encode("idë¥¼ ì˜ëª» ì…ë ¥í•˜ì˜€ìŠµë‹ˆë‹¤", "utf-8");
+//			
+//			m.addAttribute("msg", msg);
+//			return "redirect:/register/add";//ì•„ë˜ returnê³¼ ë™ì¼í•¨(ìŠ¤í”„ë§ì´ ìë™ìœ¼ë¡œ ì•„ë˜ì™€ ê°™ì´ ë°”ê¿”ì¤Œ)
+//			
+////			return "redirect:/register/add?msg=" + msg;//urlì¬ì‘ì„±
+//		}
+		//2.DBì— ì‹ ê·œíšŒì› ì •ë³´ ì €ì¥
 		return "registerInfo";
 	}
 
-	//À¯È¿¼º °Ë»ç ¸Ş¼­µå
+	//ìœ íš¨ì„± ê²€ì‚¬ ë©”ì„œë“œ
 	private boolean isValue(User user) {
 		
 		return true;
