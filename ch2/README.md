@@ -239,5 +239,87 @@ session.setMaxInactiveInterval(30*60) //방법2. 예약 종료(30분 후)
 	- @ControllerAdvice클래스의 @ExceptionHandler메서드가 처리
 	- 예외 종류별로 뷰 지정 - SimpleMappingExceptionResolver
 	- 응답 상태 코드별로 뷰 지정 - <error-page>
+##  :pushpin: 데이터의 변환과 검증
+### 데이터의 변환
+1. WebDataBinder
+	1. 요청 받은 데이터(parametaMap에 저장된)에 대한 타입변환 > 결과를 BindingResult에 저장(에러 발생시 에러와 함께)
+		1. 커스텀propertyEditor
+		2. Conversion Service
+		3. defult PropertyEditor
+		(1. ~ 3. 우선순위)
+	2. 데이터 검증 > 에러 발생시 BindingResult(interface)에 저장, 문제 없을 경우 해당 객체에 결과값이 담긴다.
+	3. BindingResult는 Controller로 넘겨줘서 Controller는 적절히 판단해서 처리
+	[코드참조](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/java/com/fastcampus/ch2/RegisterController.java#L37)
+2. Controller에 변환기능 추가하기
+[코드참조](https://github.com/KhaeMiin/fastcampus/blob/master/ch2/src/main/java/com/fastcampus/ch2/RegisterController.java#L20)
 
+	```
+		@InitBinder//현재 Controller내에서만 적용이 된다.
+		public void toDate(WebDataBinder binder) {
+		
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			binder.registerCustomEditor(Date.class, new CustomDateEditor(df, false));//false: 빈 값을 허용할 것인지
+			binder.registerCustomEditor(String[].class, new StringArrayPropertyEditor("#"));
+		}
+	```
+	
+3. PropertyEditor 
+	- 양방향 타입 변환(String -> 타입, 타입 -> String)
+		특정 타입이나 이름의 필드에 적용 가능
+		- 디폴트 PropertyEditor: 스프링이 기본적으로 제공
+		- 커스텀 PropertyEditor: 사용자가 직접 구현. PropertyEditorSupport를 상속하면 편리
+	- 모든 컨트롤러 내에서의 변환 - WebBinginglnitializer를 구현후 등록
+	- 특정 컨트롤러 내에서의 변환 - 컨트롤러에 @InitBinder가 붙은 메서드를 작성(2. Controller에 변환기능 추가하기: 참조코드 확인)
+
+4. Converter와 ConbersionService
+	- Converter - 단방향 타입 변환(타입A -> 타입B)
+						PropertyEditor(양방향)의 단점을 개선(stateful -> stateless(Converter))
+						(Property: iv 인스턴스 변수 > 싱글톤 사용불가: 객체를 계속하여 생성함)
+
+5. Formatter 
+	- 양방향 타입 변환(String → 타입, 타입 → String)
+	바인딩할 필드에 적용 - @NumberFormat(숫자타입 변환 시 사용), @DateTimeFormat(날짜타입 변환시 사용)
+
+
+### 데이터의 검증
+6. Validator란?
+	- 객체를 검증하기 위한 인터페이스. 객체 검증기(validator)구현에 사용
+	```
+	public interface Validator {
+		//매개변수로 들어온 이 클래스가 이 검증기로 검증가능한 객체인지 알려주는 메서드
+		boolean supports(Class<?> clazz);
+		//객체를 검증하는 메서드 - target: 검증할 객체, errors: 검증시 발생한 에러저장소
+		void validate(Object target, Errors errors);
+	}
+	```
+7. Validator를 이용한 검증 - 수동
+8. Validator를 이용한 검증 - 자동
+9. 글로벌 Validator
+	하나의 Validator로 여러 객체를 검증할 때, 글로벌 Validator로 등록
+	- 글로벌 Validator로 등록하는 방법 
+	```
+	//servlet-context.xml
+	<annotation-driven validator="globalValidator"/>
+	<beans:bean id="globalValidator" class="com.git.ch2.GlobalValidator"/>
+	//beans:bean: 빈등록
+	```
+	- 글로벌 Validator와 로컬 Validator를 동시에 적용하는 방법
+	```
+	//Controller
+	@InitBinder
+	public void toDate(WebDataBinder binder) {
+	SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+	binder.registerCustomEditor(Date.class, new CustomDateEditor(df, false));
+
+	//binder.setValidator(new UserValidator()); //validator를 WebDataBinder에 등록
+	binder.addValidators(new UserValidator()); //validator를 WebDataBinder에 등록      (UserValidator: 로컬Validator등록 - 컨트롤 내에서만 사용가능)
+	```
+	
+10. MessageSource
+	- 다양한 리소스에서 메시지를 읽기 위한 인터페이스
+	- 프로퍼티 파일을 메시지 소스로 하는 ResourceBundleMessageSource라는 클래스를 빈으로 등록(servlet-context.xml)
+11. 검증 메시지의 출력
+	- 스프링이 제공하는 커스텀 태그 라이브러리 사용
+	- ```<form>```대신 ```<form:from>```사용
+	- ```<form:errors>```로 에러를 출력, path에 에러 발생 필드를 지정 (*은 모든 필드 에러)
 
